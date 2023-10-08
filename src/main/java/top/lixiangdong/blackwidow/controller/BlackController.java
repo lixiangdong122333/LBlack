@@ -22,6 +22,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static top.lixiangdong.blackwidow.constant.RedisKeyConstant.BOARD;
+import static top.lixiangdong.blackwidow.constant.RedisKeyConstant.ITEM_NAME;
+
 @RestController
 @Slf4j
 public class BlackController {
@@ -31,13 +34,13 @@ public class BlackController {
     @PostMapping("/create-black")
     public R<String> createBlack() {
         String blackId = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set("black:board:" + blackId, Board.createStandardBoard(), 1, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(ITEM_NAME + BOARD + blackId, Board.createStandardBoard(), 1, TimeUnit.DAYS);
         return R.ok(blackId);
     }
 
     @PostMapping("/join-black")
     public R<List<Piece>> joinBlack(@RequestBody JoinBlackReq joinBlackReq) {
-        Board black = (Board) redisTemplate.opsForValue().get("black:board:" + joinBlackReq.getBlackId());
+        Board black = (Board) redisTemplate.opsForValue().get(ITEM_NAME + BOARD + joinBlackReq.getBlackId());
         Collection<Piece> whitePieces = new ArrayList<>();
         Collection<Piece> blackPieces = new ArrayList<>();
         if (black != null) {
@@ -50,14 +53,14 @@ public class BlackController {
 
     @PostMapping("/move")
     public R<List<Piece>> move(@RequestBody MoveReq moveReq) {
-        Board black = (Board) redisTemplate.opsForValue().get("black:board:" + moveReq.getBlackId());
+        Board black = (Board) redisTemplate.opsForValue().get(ITEM_NAME + BOARD + moveReq.getBlackId());
         //TODO:Check if the chessboard exists
         Move move = Move.MoveFactory.createMove(black, moveReq.getCurrentCoordinate(), moveReq.getDestinationCoordinate());
 
         MoveTransition moveTransition = black.currentPlayer().makeMove(move);
         if (moveTransition.getMoveStatus().isDone()) {
             log.info("\n" + moveTransition.getToBoard());
-            redisTemplate.opsForValue().set("black:board:" + moveReq.getBlackId(), moveTransition.getToBoard(), 1, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(ITEM_NAME + BOARD + moveReq.getBlackId(), moveTransition.getToBoard(), 1, TimeUnit.DAYS);
 
             log.info("move ok");
         }
