@@ -1,0 +1,11 @@
+server:
+    port: 8081
+spring:
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: root
+        password: Li@122333
+        url: jdbc:mysql://82.157.233.194:3306/black?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useAffectedRows=true&useSSL=false&allowPublicKeyRetrieval=true
+    redis:
+        host: 82.157.233.194
+        password: Li@122333
